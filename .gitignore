@@ -1,0 +1,6 @@
+*secret.yaml
+tls_generate/
+kubeconfig
+__pycache__
+.vscode
+.devcontainer

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-task
+spec:
+  selector:
+    matchLabels:
+      app: celery-task
+  template:
+    metadata:
+      labels:
+        app: celery-task
+    spec:
+      containers:
+        - name: celery-task
+          image: localhost:5000/celery:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          env:
+            - name: MQ_HOST
+              value: "amqp://guest@rabbitmq-service:5672//"
+            - name: LOG_DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: monogo-secret
+                  key: url

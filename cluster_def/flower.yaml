@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flower
+spec:
+  selector:
+    matchLabels:
+      app: flower
+  template:
+    metadata:
+      labels:
+        app: flower
+    spec:
+      containers:
+        - name: flower
+          image: localhost:5000/flower:latest
+          resources:
+            limits:
+              memory: "1024Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5555
+          args:
+            - --broker=amqp://guest@rabbitmq-service:5672
+            - --broker_api=http://guest:guest@rabbitmq-service:15672/api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flower-service
+spec:
+  selector:
+    app: flower
+  type: LoadBalancer
+  ports:
+    - name: "5555"
+      port: 5555
+      targetPort: 5555
+      nodePort: 30555
