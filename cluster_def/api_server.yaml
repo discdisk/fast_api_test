@@ -36,7 +36,7 @@ spec:
             memory: 100Mi
         livenessProbe:
           tcpSocket:
-            port: 3000
+            port: 8000
           initialDelaySeconds: 5
           timeoutSeconds: 5
           successThreshold: 1
@@ -45,20 +45,28 @@ spec:
         readinessProbe:
           httpGet:
             path: /_status/healthz
-            port: 3000
+            port: 8000
           initialDelaySeconds: 5
           timeoutSeconds: 2
           successThreshold: 1
           failureThreshold: 3
           periodSeconds: 10
         env:
-        - name: DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: monogo-secret
-              key: url
+          - name: MQ_HOST
+            value: "amqp://guest@rabbitmq-service:5672//"
+          - name: LOG_DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: monogo-secret
+                key: url
+        command:
+          - "sh"
+        args:
+          - "entry_server.sh"
+            
+
         ports:
-        - containerPort:  3000
+        - containerPort:  8000
           name:  api_server
       restartPolicy: Always
 
@@ -74,7 +82,7 @@ spec:
   type: LoadBalancer
   ports:
   - name: api_server
-    port: 3000
-    targetPort: 3000
+    port: 8000
+    targetPort: 8000
     protocol: TCP
-    nodePort: 3000
+    nodePort: 8000

@@ -1,35 +1,30 @@
-import mq_task.mq_task as tasks
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import sys
-import asyncio
-version = f"{sys.version_info.major}.{sys.version_info.minor}"
+from .dependencies import get_query_token, get_token_header
+from .routers import user, text_rec
+from dotenv import load_dotenv
 
+load_dotenv()
 app = FastAPI()
+
+origins = [
+    "http://api.spycehub.com",
+    "https://api.spycehub.com",
+    "http://localhost",
+    "http://localhost:8080",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.include_router(user.router)
+app.include_router(text_rec.router)
 
-class ImgURI(BaseModel):
-    imgURI: str
-
-
-@app.get("/")
-async def read_root():
-    message = f"Hello world! From FastAPI running on Uvicorn with Gunicorn. Using Python {version}"
-    return {"message": message}
-
-
-@app.post("/hand_written_digit")
-async def hand_written_digit(imgURI: ImgURI):
-    task = tasks.rec_digit.delay(imgURI.imgURI)
-    while not task.ready():
-        await asyncio.sleep(1)
-    return str(task.result)
+@app.get("/root/")
+async def root():
+    return 10

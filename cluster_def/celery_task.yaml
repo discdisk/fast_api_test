@@ -26,3 +26,7 @@ spec:
                 secretKeyRef:
                   name: monogo-secret
                   key: url
+          command:
+            - "sh"
+          args:
+            - "entry_server.sh"
