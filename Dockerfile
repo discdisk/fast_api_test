@@ -1,4 +1,5 @@
-FROM arm64v8/python:3.8-buster
+# FROM arm64v8/python:3.8-buster
+FROM python
 # RUN apt update && apt ins curl gcc libffi-dev linux-headers musl-dev
 RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
 ENV PATH "~/.poetry/bin:$PATH"

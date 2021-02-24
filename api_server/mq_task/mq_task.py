@@ -1,5 +1,5 @@
 from celery import Celery
-from rec_digit.ocr_model import ocr
+from .rec_digit.ocr_model import ocr
 import os
 mq_host = os.environ.get('MQ_HOST')
 log_db_host = os.environ.get('LOG_DB_HOST')

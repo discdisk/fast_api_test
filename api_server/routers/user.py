@@ -4,8 +4,8 @@ from datetime import timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from ..models.user import User, Token, fake_users_db
-from ..services.auth import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_current_active_user
+from ..models.user import User, Token, fake_users_db, SignUpParam, UserInDB, user_db, ObjectId
+from ..services.auth import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_current_active_user, get_password_hash
 
 router = APIRouter(prefix='/users', tags=['users'])
 @router.get("/count/")
@@ -37,3 +37,17 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 @router.get("/me/items/")
 async def read_own_items(current_user: User = Depends(get_current_active_user)):
     return [{"item_id": "Foo", "owner": current_user.username}]
+
+
+
+@router.post("/sign_up", response_model=UserInDB)
+async def sign_up(form_data: SignUpParam):
+    newUser = UserInDB(
+        # id=ObjectId(),
+        **{**form_data.dict(), **{'hashed_password': get_password_hash(form_data.password) }})
+
+    res = await user_db.insert_one(newUser.mongo())
+    # assert res.inserted_id == newUser.id
+    newUser.id = res.inserted_id
+    return newUser.dict(exclude_none=True)
+

@@ -1,17 +1,16 @@
+from dotenv import load_dotenv
+from os.path import join, dirname
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .dependencies import get_query_token, get_token_header
 from .routers import user, text_rec
-from dotenv import load_dotenv
 
-load_dotenv()
 app = FastAPI()
 
 origins = [
-    "http://api.spycehub.com",
-    "https://api.spycehub.com",
-    "http://localhost",
-    "http://localhost:8080",
+    "*"
 ]
 
 app.add_middleware(
